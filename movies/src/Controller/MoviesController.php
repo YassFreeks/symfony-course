@@ -3,24 +3,38 @@
 namespace App\Controller;
 
 use App\Entity\Movie;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\MovieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MoviesController extends AbstractController
 {
-    private $em;
-    public function __construct(EntityManagerInterface $em)
+    private $movieRepository;
+
+    public function __construct(MovieRepository $movieRepository)
     {
-        $this->em = $em;
+        $this->movieRepository = $movieRepository;
     }
 
+    #[Route('/movies/{id}', methods: ['GET'], name: 'movie_show')]
+    public function show($id): Response
+    {
+        $movie = $this->movieRepository->find($id);
 
-    #[Route('/movies', name: 'movies')]
+        return $this->render('movies/show.html.twig', [
+            'movie' => $movie
+        ]);
+    }
+
+    #[Route('/movies', methods: ['GET'], name: 'movie_index')]
     public function index(): Response
     {
+        $movies = $this->movieRepository->findAll();
 
-        return $this->render('index.html.twig');
+        return $this->render('movies/index.html.twig', [
+            'movies' => $movies
+        ]);
     }
 }
+      
